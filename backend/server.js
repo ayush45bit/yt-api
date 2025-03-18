@@ -82,15 +82,15 @@ app.post("/download", async (req, res) => {
     }
 
     logWithTimestamp(`Fetching video from: ${videoUrl}`);
-    const response = await axios.get(videoUrl, { responseType: "arraybuffer" });
-    logWithTimestamp(`Video fetched, response size: ${response.data.length} bytes`);
+    // const response = await axios.get(videoUrl, { responseType: "arraybuffer" });
+    // logWithTimestamp(`Video fetched, response size: ${response.data.length} bytes`);
 
-    logWithTimestamp("Setting response headers");
-    res.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
-    res.setHeader("Content-Type", "video/mp4");
+    // logWithTimestamp("Setting response headers");
+    // res.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
+    // res.setHeader("Content-Type", "video/mp4");
 
-    logWithTimestamp("Sending video data to client");
-    res.send(Buffer.from(response.data));
+    logWithTimestamp("Sending video url to client");
+    res.send(videoUrl);
     logWithTimestamp("Video data sent successfully");
   } catch (error) {
     logWithTimestamp("Caught an error in the download process");
