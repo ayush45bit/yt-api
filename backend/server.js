@@ -12,12 +12,6 @@ app.use(express.json());
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
 const cookiesPath = path.join(__dirname, "cookies.txt");
 
-try {
-  fs.chmodSync(ytDlpPath, "755");
-  console.log("Set executable permissions for yt-dlp");
-} catch (err) {
-  console.error("Failed to set permissions for yt-dlp:", err);
-}
 
 app.post("/download", async (req, res) => {
   const { url } = req.body;
@@ -39,7 +33,8 @@ app.post("/download", async (req, res) => {
    try {
     const { stdout, stderr } = await new Promise((resolve, reject) => {
       execFile(ytDlpPath, [
-        "--cookies", cookiesPath,  // Pass cookies file
+        "--cookies", cookiesPath,
+        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124",// Pass cookies file
         "-f", "best",             // Keep this for now
         "--get-url",              // Get the direct URL
         url
