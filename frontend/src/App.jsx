@@ -1,54 +1,47 @@
 import React, { useState } from "react";
 
 function App() {
-    const [url, setUrl] = useState("");
+  const [url, setUrl] = useState("");
 
-    const handleDownload = async () => {
-        try {
-            // Send POST request to the server with the YouTube URL
-            const response = await fetch("https://yt-api-4ez2.onrender.com/download", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ url }),
-            });
+  const handleDownload = async () => {
+    try {
+      const response = await fetch("https://yt-api-4ez2.onrender.com/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
 
-            // Check if the request was successful
-            if (!response.ok) {
-                throw new Error("Failed to download video");
-            }
+      if (!response.ok) {
+        throw new Error(`Failed to get video URL: ${response.statusText}`);
+      }
 
-            // Convert the response to a Blob
-            console.log(response)
-            const blob = await response.blob();
-            const downloadUrl = URL.createObjectURL(blob);
+      const { videoUrl } = await response.json();
+      console.log("Video URL received:", videoUrl);
 
-            // Create a temporary link to trigger the download
-            const a = document.createElement("a");
-            a.href = downloadUrl;
-            a.download = "video.mp4"; // Set the filename
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+      // Trigger download directly with the URL
+      const a = document.createElement("a");
+      a.href = videoUrl;
+      a.download = "video.mp4"; // Suggests a filename (may not always work)
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Error downloading video:", error.message);
+    }
+  };
 
-            // Clean up the object URL
-            URL.revokeObjectURL(downloadUrl);
-        } catch (error) {
-            console.error("Error downloading video:", error);
-        }
-    };
-
-    return (
-        <div>
-            <h1>YouTube Video Downloader</h1>
-            <input
-                type="text"
-                placeholder="Enter YouTube URL"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-            />
-            <button onClick={handleDownload}>Download Video</button>
-        </div>
-    );
+  return (
+    <div>
+      <h1>YouTube Video Downloader</h1>
+      <input
+        type="text"
+        placeholder="Enter YouTube URL"
+        value={url}
+        onChange={(e) => setUrl(e.target.value)}
+      />
+      <button onClick={handleDownload}>Download Video</button>
+    </div>
+  );
 }
 
 export default App;
