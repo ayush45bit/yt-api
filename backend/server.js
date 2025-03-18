@@ -55,7 +55,7 @@ app.post("/download", async (req, res) => {
    res.send(Buffer.from(response.data));
 
   
-    });
+  
   } catch (error) {
     console.error("Error in download process:", error.err || error);
     const details = error.stderr || error.message || "Unknown error";
