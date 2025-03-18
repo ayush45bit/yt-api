@@ -15,7 +15,7 @@ app.post("/download", (req, res) => {
 
     exec(`yt-dlp -f best --get-url "${url}"`, (err, stdout) => {
         if (err) {
-            return res.status(500).json({ error: "Failed to get video URL" });
+            return res.status(500).json({err:err, error: "Failed to get video URL" });
         }
 
         const videoUrl = stdout.trim();
