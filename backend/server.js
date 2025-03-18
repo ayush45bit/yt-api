@@ -54,7 +54,7 @@ app.post("/download", async (req, res) => {
     logWithTimestamp(`Executing yt-dlp to fetch video URL for: ${url}`);
     const { stdout, stderr } = await new Promise((resolve, reject) => {
       const args = [
-        "--proxy", "socks4://136.226.48.245:10230",
+        "--proxy", "http://130.36.36.29:443",
         "-f", "best",
         "--get-url",
         url
