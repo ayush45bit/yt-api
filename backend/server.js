@@ -178,7 +178,7 @@ app.post("/download", async (req, res) => {
     }
 
     logWithTimestamp(`Fetching video from: ${videoUrl}`);
-    const proxyAgent = new HttpsProxyAgent(proxyUrl);
+    const proxyAgent = HttpsProxyAgent(proxyUrl);
     const response = await axios.get(videoUrl, {
       responseType: "stream",
       httpsAgent: proxyAgent,
