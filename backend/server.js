@@ -101,7 +101,18 @@ const axios = require("axios");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const HttpsProxyAgent = require("https-proxy-agent");
+
+// Dynamic import for HttpsProxyAgent to handle version differences
+let HttpsProxyAgent;
+try {
+  const proxyModule = require("https-proxy-agent");
+  // v7.x exports a function, older versions might export a constructor or object
+  HttpsProxyAgent = proxyModule.default || proxyModule.HttpsProxyAgent || proxyModule;
+  console.log(`[${new Date().toISOString()}] Loaded HttpsProxyAgent: ${typeof HttpsProxyAgent}`);
+} catch (err) {
+  console.error(`[${new Date().toISOString()}] Failed to load HttpsProxyAgent: ${err.message}`);
+  throw new Error("HttpsProxyAgent module failed to load");
+}
 
 const app = express();
 
@@ -150,7 +161,7 @@ app.post("/download", async (req, res) => {
     logWithTimestamp(`Executing yt-dlp to fetch video URL for: ${url}`);
     const { stdout, stderr } = await new Promise((resolve, reject) => {
       const args = [
-        "--proxy", "http://130.36.36.29:443",
+        "--proxy", proxyUrl,
         "-f", "best",
         "--get-url",
         url
@@ -178,7 +189,7 @@ app.post("/download", async (req, res) => {
     }
 
     logWithTimestamp(`Fetching video from: ${videoUrl}`);
-    const proxyAgent = HttpsProxyAgent(proxyUrl);
+    const proxyAgent = HttpsProxyAgent(proxyUrl); // Use the dynamically resolved function
     const response = await axios.get(videoUrl, {
       responseType: "stream",
       httpsAgent: proxyAgent,
