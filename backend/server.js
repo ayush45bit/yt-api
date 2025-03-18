@@ -36,15 +36,6 @@ app.post("/download", async (req, res) => {
     return res.status(500).json({ error: "Cookies file not found" });
   }
 
-  // Execute yt-dlp to get the direct video URL
-  execFile(ytDlpPath, ["-f", "best", "--get-url", url], async (err, stdout, stderr) => {
-    if (err) {
-      console.error("Error executing yt-dlp:", err);
-      return res.status(500).json({ error: "Failed to get video URL", details: stderr || err.message });
-    }
-
-    const videoUrl = stdout.trim();
-
    try {
     const { stdout, stderr } = await new Promise((resolve, reject) => {
       execFile(ytDlpPath, [
