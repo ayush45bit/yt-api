@@ -37,9 +37,7 @@ app.post("/download", async (req, res) => {
    try {
     const { stdout, stderr } = await new Promise((resolve, reject) => {
       execFile(ytDlpPath, [
-        "--proxy", "http://130.36.36.29:443",
-        "--cookies", cookiesPath,
-        "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124",// Pass cookies file
+        "--proxy", "socks4://136.226.48.245:10230"
         "-f", "best",             // Keep this for now
         "--get-url",              // Get the direct URL
         url
