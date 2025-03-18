@@ -81,8 +81,11 @@ function App() {
         body: JSON.stringify({ url }),
       });
 
+      console.log("Response status:", response.status, "Status text:", response.statusText);
+
       if (!response.ok) {
-        throw new Error(`Failed to download video: ${response.statusText}`);
+        const errorText = await response.text(); // Get more error details
+        throw new Error(`Failed to download video: ${response.status} - ${errorText || response.statusText}`);
       }
 
       const blob = await response.blob();
