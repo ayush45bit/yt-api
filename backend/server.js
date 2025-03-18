@@ -13,7 +13,7 @@ const logWithTimestamp = (message) => {
 };
 
 app.use(cors({
-  origin: "https://yt-api-1.onrender.com",
+  origin: "*",
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"],
 }));
