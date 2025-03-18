@@ -13,7 +13,7 @@ app.post("/download", (req, res) => {
         return res.status(400).json({ error: "YouTube URL is required" });
     }
 
-    exec(`yt-dlp -f best --get-url "${url}"`, (err, stdout) => {
+    exec("./bin/yt-dlp", ["-f", "best", "--get-url", url], (err, stdout) => {
         if (err) {
             return res.status(500).json({err:err, error: "Failed to get video URL" });
         }
