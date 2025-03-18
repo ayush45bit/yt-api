@@ -10,6 +10,14 @@ app.use(cors());
 app.use(express.json());
 
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
+const cookiesPath = path.join(__dirname, "cookies.txt");
+
+try {
+  fs.chmodSync(ytDlpPath, "755");
+  console.log("Set executable permissions for yt-dlp");
+} catch (err) {
+  console.error("Failed to set permissions for yt-dlp:", err);
+}
 
 app.post("/download", async (req, res) => {
   const { url } = req.body;
@@ -23,6 +31,11 @@ app.post("/download", async (req, res) => {
     return res.status(500).json({ error: "yt-dlp binary not found" });
   }
 
+  if (!fs.existsSync(cookiesPath)) {
+    console.error("Cookies file not found at", cookiesPath);
+    return res.status(500).json({ error: "Cookies file not found" });
+  }
+
   // Execute yt-dlp to get the direct video URL
   execFile(ytDlpPath, ["-f", "best", "--get-url", url], async (err, stdout, stderr) => {
     if (err) {
@@ -32,21 +45,36 @@ app.post("/download", async (req, res) => {
 
     const videoUrl = stdout.trim();
 
-    try {
-      // Fetch video as arraybuffer
-      const response = await axios.get(videoUrl, { responseType: "arraybuffer" });
+   try {
+    const { stdout, stderr } = await new Promise((resolve, reject) => {
+      execFile(ytDlpPath, [
+        "--cookies", cookiesPath,  // Pass cookies file
+        "-f", "best",             // Keep this for now
+        "--get-url",              // Get the direct URL
+        url
+      ], (err, stdout, stderr) => {
+        if (err) reject({ err, stderr });
+        else resolve({ stdout, stderr });
+      });
+    });
 
-      // Set headers to trigger download
-      res.setHeader("Content-Disposition", `attachment; filename="video.mp4"`);
-      res.setHeader("Content-Type", "video/mp4");
-
-      // Send the downloaded video as response
-      res.send(Buffer.from(response.data));
-    } catch (error) {
-      console.error("Error downloading video:", error.message);
-      res.status(500).json({ error: "Error downloading video", details: error.message });
+    const videoUrl = stdout.trim();
+    if (!videoUrl) {
+      throw new Error("No video URL returned by yt-dlp");
     }
-  });
+
+    const response = await axios.get(videoUrl, { responseType: "arraybuffer" });
+    res.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
+    res.setHeader("Content-Type", "video/mp4");
+   res.send(Buffer.from(response.data));
+
+  
+    });
+  } catch (error) {
+    console.error("Error in download process:", error.err || error);
+    const details = error.stderr || error.message || "Unknown error";
+    res.status(500).json({ error: "Failed to process video", details });
+  }
 });
 
 app.listen(3000, () => console.log("Server running on port 3000"));
