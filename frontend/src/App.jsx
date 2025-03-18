@@ -18,13 +18,18 @@ function App() {
       const { videoUrl } = await response.json();
       console.log("Video URL received:", videoUrl);
 
+      const blob = await videoResponse.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+
       // Trigger download directly with the URL
       const a = document.createElement("a");
-      a.href = videoUrl;
+      a.href = downloadUrl;
       a.download = "video.mp4"; // Suggests a filename (may not always work)
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+
+      URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Error downloading video:", error.message);
     }
