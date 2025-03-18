@@ -6,7 +6,7 @@ function App() {
     const handleDownload = async () => {
         try {
             // Send POST request to the server with the YouTube URL
-            const response = await fetch("http://localhost:3000/download", {
+            const response = await fetch("https://yt-api-4ez2.onrender.com/download", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ url }),
