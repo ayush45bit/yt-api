@@ -18,6 +18,7 @@ function App() {
             }
 
             // Convert the response to a Blob
+            console.log(response)
             const blob = await response.blob();
             const downloadUrl = URL.createObjectURL(blob);
 
