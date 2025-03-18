@@ -101,6 +101,7 @@ const axios = require("axios");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
+const HttpsProxyAgent = require("https-proxy-agent");
 
 const app = express();
 
@@ -117,6 +118,7 @@ app.use(express.json());
 
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
 const cookiesPath = path.join(__dirname, "cookies.txt");
+const proxyUrl = "http://130.36.36.29:443";
 
 app.post("/download", async (req, res) => {
   logWithTimestamp("Received request to /download endpoint");
@@ -176,8 +178,10 @@ app.post("/download", async (req, res) => {
     }
 
     logWithTimestamp(`Fetching video from: ${videoUrl}`);
+    const proxyAgent = new HttpsProxyAgent(proxyUrl);
     const response = await axios.get(videoUrl, {
       responseType: "stream",
+      httpsAgent: proxyAgent,
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124",
         "Referer": "https://www.youtube.com/",
