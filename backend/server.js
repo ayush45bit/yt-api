@@ -6,7 +6,11 @@ const path = require("path");
 const fs = require("fs");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://yt-api-1.onrender.com", // Allow only your frontend
+  methods: ["GET", "POST", "OPTIONS"],     // Allow these methods
+  allowedHeaders: ["Content-Type"],        // Allow this header
+}));
 app.use(express.json());
 
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
