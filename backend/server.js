@@ -139,7 +139,7 @@ app.use(express.json());
 
 // Constants
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
-const proxyUrl = "http://130.36.36.29:443";
+const proxyUrl = `http://${process.env.PROXY_ID}:${process.env.PROXY_PASS}@198.23.214.116:6383`
 
 // Helper: Validate URL
 const isValidUrl = (url) => {
@@ -159,7 +159,7 @@ const execYtDlp = (args) => {
       else resolve({ stdout, stderr });
     });
     // Timeout after 30 seconds
-    setTimeout(() => reject(new Error("yt-dlp timed out after 30s")), 60000).unref();
+    setTimeout(() => reject(new Error("yt-dlp timed out after 120s")), 120000).unref();
     process.on("error", (err) => reject({ err, stderr: "Process error" }));
   });
 };
@@ -218,8 +218,7 @@ app.post("/download", async (req, res) => {
     try {
       response = await axios.get(videoUrl, {
         responseType: "arraybuffer",
-        httpsAgent: proxyAgent,
-        timeout: 60000, // 60s timeout for large files
+        httpsAgent: proxyAgent, 
         headers: {
           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124",
           "Referer": "https://www.youtube.com/",
