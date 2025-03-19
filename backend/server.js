@@ -139,7 +139,7 @@ app.use(express.json());
 
 // Constants
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
-const proxyUrl = "http://130.36.36.29:443";
+const proxyUrl = "http://45.140.143.77:18080";
 
 // Helper: Validate URL
 const isValidUrl = (url) => {
