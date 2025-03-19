@@ -117,7 +117,7 @@ app.use(cors({
 app.use(express.json());
 
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
-const proxyUrl = "http://130.36.36.29:443";
+const proxyUrl = "socks4://104.16.107.206:80";
 
 app.post("/download", async (req, res) => {
   logWithTimestamp("Received request to /download endpoint");
