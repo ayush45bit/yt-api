@@ -103,22 +103,20 @@ const path = require("path");
 const fs = require("fs");
 const {HttpsProxyAgent} =require('https-proxy-agent')
 
-// Dynamic import for HttpsProxyAgent to handle version differences
 const app = express();
 
 const logWithTimestamp = (message) => {
-  console.log(`[${new Date().toISOString()}] ${message}`);
+  console.log(message);
 };
 
 app.use(cors({
   origin: "*",
-  methods: ["GET", "POST", "OPTIONS"],
+  methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"],
 }));
 app.use(express.json());
 
 const ytDlpPath = path.join(__dirname, "bin", "yt-dlp");
-const cookiesPath = path.join(__dirname, "cookies.txt");
 const proxyUrl = "http://130.36.36.29:443";
 
 app.post("/download", async (req, res) => {
@@ -139,13 +137,6 @@ app.post("/download", async (req, res) => {
   }
   logWithTimestamp("yt-dlp binary found");
 
-  logWithTimestamp(`Checking if cookies file exists at: ${cookiesPath}`);
-  if (!fs.existsSync(cookiesPath)) {
-    logWithTimestamp("Cookies file not found");
-    console.error(`Cookies file not found at ${cookiesPath}`);
-    return res.status(500).json({ error: "Cookies file not found" });
-  }
-  logWithTimestamp("Cookies file found");
 
   try {
     logWithTimestamp(`Executing yt-dlp to fetch video URL for: ${url}`);
@@ -181,7 +172,7 @@ app.post("/download", async (req, res) => {
     logWithTimestamp(`Fetching video from: ${videoUrl}`);
     const proxyAgent = new HttpsProxyAgent(proxyUrl); // Use the dynamically resolved function
     const response = await axios.get(videoUrl, {
-      responseType: "stream",
+      responseType: "arraybuffer",
       httpsAgent: proxyAgent,
       headers: {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124",
@@ -193,15 +184,16 @@ app.post("/download", async (req, res) => {
     res.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
     res.setHeader("Content-Type", "video/mp4");
 
-    logWithTimestamp("Streaming video to client");
-    response.data.pipe(res);
-    response.data.on("end", () => {
-      logWithTimestamp("Video stream completed successfully");
-    });
-    response.data.on("error", (err) => {
-      logWithTimestamp(`Stream error: ${err.message}`);
-      res.status(500).json({ error: "Stream failed", details: err.message });
-    });
+    // logWithTimestamp("Streaming video to client");
+    // response.data.pipe(res);
+    // response.data.on("end", () => {
+    //   logWithTimestamp("Video stream completed successfully");
+    // });
+    // response.data.on("error", (err) => {
+    //   logWithTimestamp(`Stream error: ${err.message}`);
+    //   res.status(500).json({ error: "Stream failed", details: err.message });
+    // });
+    res.send(Buffer.from(response.data));
   } catch (error) {
     logWithTimestamp("Caught an error in the download process");
     console.error("Error in download process:", error.err || error);
