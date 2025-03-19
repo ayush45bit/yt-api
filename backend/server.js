@@ -159,7 +159,7 @@ const execYtDlp = (args) => {
       else resolve({ stdout, stderr });
     });
     // Timeout after 30 seconds
-    setTimeout(() => reject(new Error("yt-dlp timed out after 30s")), 30000).unref();
+    setTimeout(() => reject(new Error("yt-dlp timed out after 30s")), 60000).unref();
     process.on("error", (err) => reject({ err, stderr: "Process error" }));
   });
 };
